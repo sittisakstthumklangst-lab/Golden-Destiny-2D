@@ -1009,6 +1009,26 @@ const _d=draw;draw=function(){if(!P||!S||!P.ox)return _d();const ps=PS,sw=S.wp;P
  X.save();X.translate(sx,P.y);X.rotate(a*P.dir);X.translate(-sx,-P.y);dsp(OXS,P.x,P.y+(o=='dig'?6:0),P.dir,fr,1.6,P.fl>0);X.restore();tx('OX',sx,P.y-112,'#d9a521',11,'center')};
 })();
 
-requestAnimationFrame(loop);
+
 {const b=document.getElementById("boot");if(b)b.style.display="none"}
-</script></body></html>
+requestAnimationFrame(loop);
+   <!-- ... โค้ดเกมเดิมของคุณอยู่ด้านบนนี้ ... -->
+
+  <!-- วางโค้ดส่วนนี้ไว้ก่อนปิด </body> -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    let allPlayers = {};
+
+    // 1. รับข้อมูลตำแหน่งผู้เล่นทุกคนจาก Server
+    socket.on("updatePlayers", (playersData) => {
+      allPlayers = playersData;
+    });
+
+    // 2. ฟังก์ชันส่งตำแหน่งของเราไปให้เพื่อนเห็น
+    function sendMyPosition(myX, myY) {
+      socket.emit("move", { x: myX, y: myY });
+    }
+  </script>
+</body>
+</html>
