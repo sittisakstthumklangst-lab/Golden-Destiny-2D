@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3000;
 const ROOM_PASS = process.env.ROOM_PASS || '12345';
 const MAX_PLAYERS = 6;
 const UID_RE = /^\d{10}$/;
+
 const rooms = new Map(); // code -> { players: Map<ws, { uid, name }> }
 
 const app = express();
@@ -18,7 +19,9 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server, maxPayload: 4096 });
 
 function send(ws, data) {
-  if (ws.readyState === 1) ws.send(JSON.stringify(data));
+  if (ws.readyState === 1) {
+    ws.send(JSON.stringify(data));
+  }
 }
 
 function broadcast(room, data, except) {
@@ -38,20 +41,30 @@ function newCode() {
 function leave(ws) {
   const code = ws.room;
   if (!code) return;
-  ws.room = null;
+
   const room = rooms.get(code);
+  ws.room = null;
   if (!room) return;
+
   const p = room.players.get(ws);
   if (!p) return;
+
   room.players.delete(ws);
   broadcast(room, { t: 'leave', uid: p.uid });
-  if (room.players.size === 0) rooms.delete(code);
+
+  if (room.players.size === 0) {
+    rooms.delete(code);
+  }
 }
 
 function handleJoin(ws, m, isCreate) {
   const uid = String(m.uid || '');
-  if (!UID_RE.test(uid)) return send(ws, { t: 'err', msg: 'UID ต้องเป็นตัวเลข 10 หลัก' });
-  if (m.pass !== ROOM_PASS) return send(ws, { t: 'err', msg: 'รหัสผ่านไม่ถูกต้อง' });
+  if (!UID_RE.test(uid)) {
+    return send(ws, { t: 'err', msg: 'UID ต้องเป็นตัวเลข 10 หลัก' });
+  }
+  if (m.pass !== ROOM_PASS) {
+    return send(ws, { t: 'err', msg: 'รหัสผ่านไม่ถูกต้อง' });
+  }
 
   const name = String(m.name || '').trim().slice(0, 16) || 'Hero';
 
@@ -64,12 +77,16 @@ function handleJoin(ws, m, isCreate) {
   }
 
   const room = rooms.get(code);
-  if (!room) return send(ws, { t: 'err', msg: 'ไม่พบห้องนี้' });
+  if (!room) {
+    return send(ws, { t: 'err', msg: 'ไม่พบห้องนี้' });
+  }
 
   // ถ้าเคยอยู่ในห้องอื่นอยู่ ให้ออกจากห้องนั้นก่อน
-  if (ws.room && ws.room !== code) leave(ws);
+  if (ws.room && ws.room !== code) {
+    leave(ws);
+  }
 
-  // ถ้า UID เดิมค้างอยู่ในห้องนี้ (เช่น iPad หลุดแล้วแต่เซิร์ฟเวอร์ยังไม่รู้) ให้แทนที่การเชื่อมต่อเดิม
+  // ถ้า UID เดิมค้างอยู่ในห้องนี้ (เช่น เครื่องหลุดแล้วแต่เซิร์ฟเวอร์ยังไม่รู้) ให้แทนที่การเชื่อมต่อเดิม
   for (const [oldWs, p] of room.players) {
     if (p.uid === uid && oldWs !== ws) {
       room.players.delete(oldWs);
@@ -100,11 +117,17 @@ function handleJoin(ws, m, isCreate) {
 wss.on('connection', ws => {
   ws.room = null;
   ws.isAlive = true;
-  ws.on('pong', () => { ws.isAlive = true; });
+  ws.on('pong', () => {
+    ws.isAlive = true;
+  });
 
   ws.on('message', raw => {
     let m;
-    try { m = JSON.parse(raw); } catch { return; }
+    try {
+      m = JSON.parse(raw);
+    } catch {
+      return;
+    }
 
     if (m.t === 'create') return handleJoin(ws, m, true);
     if (m.t === 'join') return handleJoin(ws, m, false);
@@ -115,6 +138,7 @@ wss.on('connection', ws => {
       const room = rooms.get(ws.room);
       const p = room && room.players.get(ws);
       if (!p) return;
+
       broadcast(room, {
         t: 'st',
         uid: p.uid,
@@ -145,4 +169,6 @@ const heartbeat = setInterval(() => {
 
 wss.on('close', () => clearInterval(heartbeat));
 
-server.listen(PORT, () => console.log('Golden Destiny 2D listening on', PORT));
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
