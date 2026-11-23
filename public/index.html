@@ -1011,4 +1011,23 @@ const _d=draw;draw=function(){if(!P||!S||!P.ox)return _d();const ps=PS,sw=S.wp;P
 
 requestAnimationFrame(loop);
 {const b=document.getElementById("boot");if(b)b.style.display="none"}
-</script></body></html>
+  <!-- ... โค้ดเกมเดิมของคุณอยู่ด้านบนนี้ ... -->
+
+  <!-- วางโค้ดส่วนนี้ไว้ก่อนปิด </body> -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    let allPlayers = {};
+
+    // 1. รับข้อมูลตำแหน่งผู้เล่นทุกคนจาก Server
+    socket.on("updatePlayers", (playersData) => {
+      allPlayers = playersData;
+    });
+
+    // 2. ฟังก์ชันส่งตำแหน่งของเราไปให้เพื่อนเห็น
+    function sendMyPosition(myX, myY) {
+      socket.emit("move", { x: myX, y: myY });
+    }
+  </script>
+</body>
+</html>
