@@ -1,0 +1,16 @@
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  let allPlayers = {};
+
+  // 1. รับข้อมูลตำแหน่งผู้เล่นทุกคนจาก Server
+  socket.on("updatePlayers", (playersData) => {
+    allPlayers = playersData;
+  });
+
+  // 2. เมื่อตัวละครของคุณขยับ ให้ส่งพิกัด x, y ใหม่ไปบอก Server
+  // (นำบรรทัด socket.emit นี้ไปใส่ในจุดที่โค้ดเกมของคุณสั่งให้ตัวละครเดิน)
+  function sendMyPosition(myX, myY) {
+    socket.emit("move", { x: myX, y: myY });
+  }
+</script>
