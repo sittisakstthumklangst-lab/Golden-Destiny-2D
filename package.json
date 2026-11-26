@@ -1,15 +1,9 @@
 {
-  "name": "golden-destiny-accounts",
-  "version": "1.0.0",
+  "name": "golden-destiny-server",
+  "version": "2.0.0",
   "private": true,
   "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.19.2"
-  },
-  "engines": {
-    "node": ">=18"
-  }
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.19.2", "ws": "^8.17.1" },
+  "engines": { "node": ">=18" }
 }
