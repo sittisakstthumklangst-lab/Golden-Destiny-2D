@@ -1,9 +1,9 @@
 {
-  "name": "golden-destiny-mp",
+  "name": "golden-destiny-accounts",
   "version": "1.0.0",
   "private": true,
-  "main": "server.js",
-  "scripts": { "start": "node server.js" },
-  "dependencies": { "express": "^4.19.2", "ws": "^8.17.1" },
+  "main": "auth-server.js",
+  "scripts": { "start": "node auth-server.js" },
+  "dependencies": { "express": "^4.19.2" },
   "engines": { "node": ">=18" }
 }
